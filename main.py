@@ -8,17 +8,17 @@ app = Flask(__name__)
 @app.route('/training/<prof>')
 def train(prof):
     if 'строитель' in prof or 'инженер' in prof:
-        img = 'sci.png'
+        img = 'ing.png'
         name_of_picture = 'Инженерные тренажёры'
     else:
         name_of_picture = 'Научные симуляторы'
-        img = 'ing.png'
-    return render_template('content.html', title=prof, img=img, name_of_picture=name_of_picture)
+        img = 'sci.png'
+    return render_template('content.html', title=prof, name_of_picture=name_of_picture)
 
 
 @app.route('/index')
 def lol():
-    return render_template('content.html', title='title', img='../picture/ing.png', name_of_picture='lol')
+    return render_template('content.html', title='title', img='ing.png', name_of_picture='lol')
 
 
 @app.route('/<title>')

@@ -2,5 +2,9 @@
 
 {% block content %}
     <h2>{{ name_of_picture }}</h2>
-    <img src="{url_for('static', filename={{ img }})}" alt="Корабль на марс это миф, пикчи не существует">
+    {% if "инженер" in img or "строитель" in img %}
+    <img src="{{ url_for('static', filename='img/ing.png') }}" alt="Корабль на марс это миф, пикчи не существует">
+    {% else %}
+    <img src="{{ url_for('static', filename='img/sci.png') }}" alt="Корабль на марс это миф, пикчи не существует">
+    {% endif %}
 {% endblock %}
