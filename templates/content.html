@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ name_of_picture }}</h2>
+    <img src="{url_for('static', filename={{ img }})}" alt="Корабль на марс это миф, пикчи не существует">
+{% endblock %}
