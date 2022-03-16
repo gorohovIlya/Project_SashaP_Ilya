@@ -1,7 +1,9 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 import random
+from whattocookfrom import whattocookfrom
 from howtoprepare import howtoprepare
+from randommeal import randommeal
 # from pprint import pprint
 
 
@@ -29,9 +31,13 @@ def main():
                     print('Новое сообщение:')
                     print('Для меня от:', event.chat_id)
                     print('Текст:', event.text)
-                    send_mes(vk_session, event.chat_id, event.text)
+                    # send_mes(vk_session, event.chat_id, event.text)
                     if event.text == "какприготовить":
                         send_mes(vk_session, event.chat_id, howtoprepare(event.text))
+                    elif event.text == "чтоприготовитьиз":
+                        send_mes(vk_session, event.chat_id, whattocookfrom(event.text))
+                    elif event.text == "случайноеблюдо":
+                        send_mes(vk_session, event.chat_id, randommeal())
         if event.type == VkEventType.CHAT_UPDATE:
             text = '''Приветствую вас! Я Бот Кулинарная книга.
 Я смогу (когда-нибудь) написать определённый рецепт блюда, 
