@@ -4,6 +4,7 @@ import random
 from whattocookfrom import whattocookfrom
 from howtoprepare import howtoprepare
 from randommeal import randommeal
+from help import help
 # from pprint import pprint
 
 
@@ -38,6 +39,8 @@ def main():
                         send_mes(vk_session, event.chat_id, whattocookfrom(event.text))
                     elif event.text == "случайноеблюдо":
                         send_mes(vk_session, event.chat_id, randommeal())
+                    elif event.text == "помощь":
+                        send_mes(vk_session, event.chat_id, help())
         if event.type == VkEventType.CHAT_UPDATE:
             text = '''Приветствую вас! Я Бот Кулинарная книга.
 Я смогу (когда-нибудь) написать определённый рецепт блюда, 
