@@ -1,6 +1,7 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 import random
+import sqlite3
 from whattocookfrom import whattocookfrom
 from howtoprepare import howtoprepare
 from randommeal import randommeal
@@ -33,8 +34,8 @@ def main():
                     print('Для меня от:', event.chat_id)
                     print('Текст:', event.text)
                     # send_mes(vk_session, event.chat_id, event.text)
-                    if event.text == "какприготовить":
-                        send_mes(vk_session, event.chat_id, howtoprepare(event.text))
+                    if event.text[0:14] == "какприготовить":
+                        send_mes(vk_session, event.chat_id, howtoprepare(event.text[14:]))
                     elif event.text == "чтоприготовитьиз":
                         send_mes(vk_session, event.chat_id, whattocookfrom(event.text))
                     elif event.text == "случайноеблюдо":
