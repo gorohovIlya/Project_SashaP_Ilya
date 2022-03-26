@@ -6,12 +6,10 @@ from howtoprepare import howtoprepare
 def randommeal():
     connection = sqlite3.connect('cooking.db')
     cursor = connection.cursor()
-    # meals = list(map(lambda x: ''.join(x), cursor.execute('SELECT meal_type FROM meal_types').fetchall()))
-    # meal = choice(meals)
-    meal = 'каша'
-    mtype = cursor.execute(f'SELECT meals FROM meal_types WHERE meal_type = "{meal}"').fetchall()
-    mtype = choice(mtype[0][0].split(', '))
-    return f"{meal} {mtype}\n{howtoprepare(' '.join([meal, mtype]))}"
+    mtype = cursor.execute(f'''SELECT meal_type, name FROM meal_types 
+JOIN cereal ON meal_types.id = cereal.id''').fetchall()
+    meal = ' '.join(list(choice(mtype)))
+    return f"{meal}\n{howtoprepare(meal)}"
 
 
 if __name__ == '__main__':
