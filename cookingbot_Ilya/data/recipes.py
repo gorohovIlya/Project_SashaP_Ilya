@@ -9,3 +9,4 @@ class Recipe(SqlAlchemyBase):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     ingridients = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     cooking_method = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
