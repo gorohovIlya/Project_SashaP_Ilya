@@ -6,7 +6,7 @@ import random
 # from randommeal import randommeal, randommeal_command
 from help import help
 from data import db_session, __all_models
-from command_structure import AddMeal
+from command_structure import AddMeal, HowToPrepare
 
 # ALL_KEYS = [howtoprepare_command.get_keys(), whattocookfrom_command.get_keys(), randommeal_command.get_keys()]
 
@@ -27,9 +27,10 @@ class CookingBot:
         vk_session = vk_api.VkApi(
             token=self.token)
         add_m = AddMeal(self, 'add_meal', 'добавление блюда в базу данных')
+        how_to_pr = HowToPrepare(self, 'how_to_prepare', 'получение рецепта блюда')
         longpoll = VkLongPoll(vk_session)
         print('работаем')
-        self.work_bot(longpoll, vk_session, add_m)
+        self.work_bot(longpoll, vk_session, add_m, how_to_pr)
         # for event in longpoll.listen():
         #     print(event.type)
         #     if event.type == VkEventType.MESSAGE_NEW:

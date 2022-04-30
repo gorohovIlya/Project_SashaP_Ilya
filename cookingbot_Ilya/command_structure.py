@@ -39,8 +39,14 @@ class HowToPrepare(Command):  # функция принимает названи
     def __init__(self, my_bot, name, description):
         super().__init__(my_bot, name, description)
 
-    def execute(self, name):
-        super().execute(name)
+    def execute(self, *args):
+        db_sess = db_session.create_session()
+        meal = args[0]
+        my_query = db_sess.query(Recipe).filter(Recipe.name == meal)
+        for elem in my_query:
+            splitted_elem_ingridients = elem.ingridients.split(" ,")
+            splitted_cooking_method = elem.cooking_method.split(" ,")
+            return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + "\n" + "\n".join(splitted_cooking_method)
 
 
 class AddMeal(Command):
@@ -48,7 +54,7 @@ class AddMeal(Command):
         super().__init__(my_bot, name, description)
         self.execute_all()
 
-    def create_reciepe(self, name, ingridients, cooking_method):
+    def create_recipe(self, name, ingridients, cooking_method):
         new_recipe = Recipe()
         new_recipe.name = name
         new_recipe.ingridients = ingridients
@@ -63,7 +69,7 @@ class AddMeal(Command):
             recipe = db_sess.query(Recipe).filter(Recipe.name == key).first()
             print(recipe)
             if not recipe:
-                new_recipe = self.create_reciepe(key, " ,".join(value["ingridients"]), " ,".join(value["cooking_method"]))
+                new_recipe = self.create_recipe(key, " ,".join(value["ingridients"]), " ,".join(value["cooking_method"]))
                 db_sess.add(new_recipe)
                 db_sess.commit()
                 print(new_recipe.name, new_recipe.ingridients, new_recipe.cooking_method)
@@ -75,12 +81,15 @@ class AddMeal(Command):
         meal_cooking_method = args[2]
         recipe = db_sess.query(Recipe).filter(Recipe.name == meal_name).first()
         if not recipe:
-            new_recipe = self.create_reciepe(meal_name, meal_ingridients, meal_cooking_method)
+            new_recipe = self.create_recipe(meal_name, meal_ingridients, meal_cooking_method)
             db_sess.add(new_recipe)
             db_sess.commit()
             return "рецепт успешно добавлен"
         else:
             return "такой рецепт уже есть"
+
+class AddUser(Command):
+    pass
 
 
 
