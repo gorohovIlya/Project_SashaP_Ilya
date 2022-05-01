@@ -1,7 +1,7 @@
 import data.db_session as db_session
 from data.recipes import Recipe
 import json
-
+import random
 
 class Command:
     def __init__(self, my_bot, name, description):
@@ -17,25 +17,12 @@ class Command:
 
     def get_description(self):
         return self.description
-    #     self.__keys = []
-    #     self.description = ''
-    #     commands.append(self)
-    #
-    # def get_keys(self):
-    #     return self.__keys
-    #
-    # def add_keys(self, keys):
-    #     for key in keys:
-    #         self.__keys.append(key)
-    #
-    # def set_description(self, description):
-    #     self.description = description
-    #
-    # def process(self):
-    #     pass
 
 
-class HowToPrepare(Command):  # функция принимает название блюда и возвращает ингридиенты и способ приготовления
+class HowToPrepare(Command):
+    """
+    This command accepts the name of the dish from the user and returns the ingredients and cooking method
+    """
     def __init__(self, my_bot, name, description):
         super().__init__(my_bot, name, description)
 
@@ -46,10 +33,51 @@ class HowToPrepare(Command):  # функция принимает названи
         for elem in my_query:
             splitted_elem_ingridients = elem.ingridients.split(" ,")
             splitted_cooking_method = elem.cooking_method.split(" ,")
-            return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + "\n" + "\n".join(splitted_cooking_method)
+            return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + "\n"\
+                   + "\n".join(splitted_cooking_method)
+
+
+class WhatToCookFrom(Command):
+    """
+    This command gets a list of ingredients from the user and returns the names of dishes that can be prepared from them
+    """
+    def __init__(self, my_bot, name, description):
+        super().__init__(my_bot, name, description)
+
+    def execute(self, *args):
+        result = set()
+        db_sess = db_session.create_session()
+        user_ings = args[0].split('/')
+        all_recipe_info = db_sess.query(Recipe).all()
+        for elem in all_recipe_info:
+            recipe_ings = elem.ingridients
+            for ing in user_ings:
+                if ing in recipe_ings:
+                    result.add(elem.name)
+        if result:
+            return "Вы можете приготовить" + "\n" + "\n".join(list(result))
+
+        else:
+            return 'вы ничего не можете с этими ингредиентами приготовить'
+
+
+class RandomMeal(Command):
+    def __init__(self, my_bot, name, description):
+        super().__init__(my_bot, name, description)
+
+    def execute(self):
+        random_id = random.randint(1, 2)
+        db_sess = db_session.create_session()
+        my_query = db_sess.query(Recipe).filter(Recipe.id == random_id)
+        for elem in my_query:
+            return elem.name
 
 
 class AddMeal(Command):
+    """
+    This command accepts from the user the name of the dish, the list of ingredients, the method of preparation and adds
+    a new recipe to the database
+    """
     def __init__(self, my_bot, name, description):
         super().__init__(my_bot, name, description)
         self.execute_all()
@@ -87,6 +115,7 @@ class AddMeal(Command):
             return "рецепт успешно добавлен"
         else:
             return "такой рецепт уже есть"
+
 
 class AddUser(Command):
     pass
