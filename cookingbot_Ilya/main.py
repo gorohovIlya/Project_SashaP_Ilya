@@ -1,17 +1,16 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 import random
-# from whattocookfrom import whattocookfrom, whattocookfrom_command
-# from howtoprepare import howtoprepare, howtoprepare_command
-# from randommeal import randommeal, randommeal_command
 from help import help
 from data import db_session, __all_models
 from command_structure import AddMeal, HowToPrepare, WhatToCookFrom, RandomMeal
+from sys import stdin
 
 
 def send_mes(vk, chat, text):
     random_id = random.randint(0, 2 ** 64)
-    vk.method('messages.send', {'chat_id': chat, 'message': text, 'random_id': random_id})
+    print(vk, chat, text, random_id)
+    vk.method('messages.send', {'peer_id': chat, 'message': text, 'random_id': random_id})
 
 
 def work_bot(longpoll, vk_session, *commands):
@@ -20,18 +19,41 @@ def work_bot(longpoll, vk_session, *commands):
         if event.type == VkEventType.MESSAGE_NEW:
             if event.to_me:
                 if event.from_chat:
-                    print(event.type)
                     print('Новое сообщение:')
-                    print('Для меня от:', event.chat_id)
+                    print('Для меня от чата', event.chat_id)
                     print('Текст:', event.text)
                     splitted_event_text = event.text.split('; ')
                     print(splitted_event_text)
                     for command in commands:
-                        if command.get_name() in splitted_event_text and command.get_name() != 'random_meal':
+                        if command.get_name() == splitted_event_text[0] and len(splitted_event_text) == 1:  # проверка на random_meal
+                            result = command.execute()
+                            send_mes(vk_session, event.peer_id, result)
+                            break
+                        elif command.get_name() in splitted_event_text:  # остальные команды
                             result = command.execute(*splitted_event_text[1:])
-                            send_mes(vk_session, event.chat_id, result)
-                        elif command.get_name() == 'random_meal':
-                            command.execute()
+                            send_mes(vk_session, event.peer_id, result)
+                            break
+                elif event.from_user:
+                    user = vk_session.get_api().users.get(user_id=event.user_id, fields='domain')[0]
+                    print('лс')
+                    print('Новое сообщение:')
+                    print(user)
+                    print('Для меня от:', f'{user["first_name"]} {user["last_name"]}: @{user["domain"]}')
+                    print('Текст:', event.text)
+                    print(event.peer_id)
+                    splitted_event_text = event.text.split('; ')
+                    print(splitted_event_text)
+                    if splitted_event_text[0] in ['помощь', 'помогите', 'help']:
+                        send_mes(vk_session, event.peer_id, help())
+                    for command in commands:
+                        if command.get_name() == splitted_event_text[0]:  # проверка на random_meal
+                            result = command.execute()
+                            send_mes(vk_session, event.peer_id, result)
+                            break
+                        elif command.get_name() in splitted_event_text:  # остальные команды
+                            result = command.execute(*splitted_event_text[1:])
+                            send_mes(vk_session, event.peer_id, result)
+                            break
         if event.type == VkEventType.CHAT_UPDATE:
             text = '''Приветствую вас! Я Бот Кулинарная книга.
 Я смогу (когда-нибудь) написать определённый рецепт блюда, 
@@ -43,7 +65,7 @@ def work_bot(longpoll, vk_session, *commands):
 class CookingBot:
     def __init__(self, token):
         self.token = token
-        # self.commands = commands
+        # self.commands = [commands]
         self.init()
 
     def init(self):
@@ -58,31 +80,6 @@ class CookingBot:
         longpoll = VkLongPoll(vk_session)
         print('работаем')
         work_bot(longpoll, vk_session, add_m, how_to_pr, what_to_cook, rand_meal)
-        # for event in longpoll.listen():
-        #     print(event.type)
-        #     if event.type == VkEventType.MESSAGE_NEW:
-        #         if event.to_me:
-        #             if event.from_chat:
-        #                 print(event.type)
-        #                 print('Новое сообщение:')
-        #                 print('Для меня от:', event.chat_id)
-        #                 print('Текст:', event.text)
-                        # for i in ALL_KEYS:
-                        #     for j in i:
-                        #         if j in event.text and j in ALL_KEYS[0]:
-                        #             send_mes(vk_session, event.chat_id, howtoprepare(event.text[len(j):]))
-                        #         elif j in event.text and j in ALL_KEYS[1]:
-                        #             send_mes(vk_session, event.chat_id, whattocookfrom(event.text[len(j):]))
-                        #         elif j in event.text and event.text in ALL_KEYS[2]:
-                        #             send_mes(vk_session, event.chat_id, randommeal())
-                        #         elif "помощь" in event.text:
-                        #             send_mes(vk_session, event.chat_id, help())
-    #         if event.type == VkEventType.CHAT_UPDATE:
-    #             text = '''Приветствую вас! Я Бот Кулинарная книга.
-    # Я смогу (когда-нибудь) написать определённый рецепт блюда,
-    # написать список блюд, у которых есть рецепт в книге,
-    # добавлять в список новые блюда и прочие действия.'''
-    #             send_mes(vk_session, event.chat_id, text)
 
 
 if __name__ == '__main__':

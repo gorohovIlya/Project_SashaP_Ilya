@@ -1,7 +1,7 @@
 import data.db_session as db_session
 from data.recipes import Recipe
 import json
-import random
+from random import choice
 
 class Command:
     def __init__(self, my_bot, name, description):
@@ -66,11 +66,13 @@ class RandomMeal(Command):
         super().__init__(my_bot, name, description)
 
     def execute(self):
-        random_id = random.randint(1, 2)
         db_sess = db_session.create_session()
-        my_query = db_sess.query(Recipe).filter(Recipe.id == random_id)
-        for elem in my_query:
-            return elem.name
+        elem = choice(db_sess.query(Recipe).all())
+        if elem != None:
+            return f'Я выбрал случайное блюдо: {elem.name}' + '\n' + 'Ингридиенты:' + "\n" + "\n".join(elem.ingridients.split(' ,')) + "\n" + 'Способ приготовления:' + "\n"\
+                   + "\n".join(elem.cooking_method.split(' ,'))
+        else:
+            return self.execute()
 
 
 class AddMeal(Command):
