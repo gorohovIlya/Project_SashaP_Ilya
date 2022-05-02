@@ -46,7 +46,7 @@ def work_bot(longpoll, vk_session, *commands):
                     if splitted_event_text[0] in ['помощь', 'помогите', 'help']:
                         send_mes(vk_session, event.peer_id, help())
                     for command in commands:
-                        if command.get_name() == splitted_event_text[0]:  # проверка на random_meal
+                        if command.get_name() == splitted_event_text[0] and command.get_name() == 'random_meal':  # проверка на random_meal
                             result = command.execute()
                             send_mes(vk_session, event.peer_id, result)
                             break
