@@ -30,9 +30,13 @@ def work_bot(longpoll, vk_session, *commands):
                             send_mes(vk_session, event.peer_id, result)
                             break
                         elif command.get_name() in splitted_event_text:  # остальные команды
-                            result = command.execute(*splitted_event_text[1:])
-                            send_mes(vk_session, event.peer_id, result)
-                            break
+                            try:
+                                result = command.execute(event.user_id, *splitted_event_text[1:])
+                                break
+                            except:
+                                result = 'скорее всего нельзя получить информацию про пользователя'
+                            finally:
+                                send_mes(vk_session, event.peer_id, result)
                 elif event.from_user:
                     user = vk_session.get_api().users.get(user_id=event.user_id, fields='domain')[0]
                     print('лс')
@@ -55,7 +59,7 @@ def work_bot(longpoll, vk_session, *commands):
                                 result = command.set_admin(event.peer_id, splitted_event_text[2])
                                 send_mes(vk_session, event.peer_id, result)
                                 break
-                            result = command.execute(*splitted_event_text[1:])
+                            result = command.execute(event.peer_id, *splitted_event_text[1:])
                             send_mes(vk_session, event.peer_id, result)
                             break
         if event.type == VkEventType.CHAT_UPDATE:
