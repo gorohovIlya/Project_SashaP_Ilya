@@ -1,6 +1,6 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-import random
+from random import randint
 from help import help
 from data import db_session, __all_models
 from command_structure import AddMeal, HowToPrepare, WhatToCookFrom, RandomMeal
