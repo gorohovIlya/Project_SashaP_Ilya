@@ -1,0 +1,5 @@
+sqlalchemy==(версия)
+datatime==
+json==
+vk_api==
+sys==
