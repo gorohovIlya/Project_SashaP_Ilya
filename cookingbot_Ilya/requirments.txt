@@ -1,5 +1,2 @@
-sqlalchemy==(версия)
-datatime==
-json==
-vk_api==
-sys==
+sqlalchemy==1.4.32
+vk_api==11.9.7
