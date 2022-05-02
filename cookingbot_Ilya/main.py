@@ -8,7 +8,7 @@ from sys import stdin
 
 
 def send_mes(vk, chat, text):
-    random_id = random.randint(0, 2 ** 64)
+    random_id = randint(0, 2 ** 64)
     print(vk, chat, text, random_id)
     vk.method('messages.send', {'peer_id': chat, 'message': text, 'random_id': random_id})
 
