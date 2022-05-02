@@ -51,6 +51,10 @@ def work_bot(longpoll, vk_session, *commands):
                             send_mes(vk_session, event.peer_id, result)
                             break
                         elif command.get_name() in splitted_event_text:  # остальные команды
+                            if splitted_event_text[1] == "set_admin":
+                                result = command.set_admin(event.peer_id, splitted_event_text[2])
+                                send_mes(vk_session, event.peer_id, result)
+                                break
                             result = command.execute(*splitted_event_text[1:])
                             send_mes(vk_session, event.peer_id, result)
                             break
