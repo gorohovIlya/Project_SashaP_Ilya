@@ -1,5 +1,6 @@
 import data.db_session as db_session
 from data.recipes import Recipe
+from data.users import User
 import json
 from random import choice
 
@@ -90,6 +91,12 @@ class AddMeal(Command):
         new_recipe.ingridients = ingridients
         new_recipe.cooking_method = cooking_method
         return new_recipe
+    
+    def create_user(self, user_id, char):
+        new_user = User()
+        new_user.user_id = user_id
+        new_user.have_admin = char
+        return new_user
 
     def execute_all(self):
         db_sess = db_session.create_session()
@@ -104,21 +111,39 @@ class AddMeal(Command):
                 db_sess.commit()
                 print(new_recipe.name, new_recipe.ingridients, new_recipe.cooking_method)
 
-    def execute(self, *args):
+    def execute(self, user_id, *args):
         db_sess = db_session.create_session()
         meal_name = args[0]
         meal_ingridients = args[1]
         meal_cooking_method = args[2]
-        recipe = db_sess.query(Recipe).filter(Recipe.name == meal_name).first()
-        if not recipe:
-            new_recipe = self.create_recipe(meal_name, meal_ingridients, meal_cooking_method)
-            db_sess.add(new_recipe)
-            db_sess.commit()
-            return "рецепт успешно добавлен"
+        user = db_sess.query(User).filter(User.namuser_id == user_id).first()
+        if user:
+            recipe = db_sess.query(Recipe).filter(Recipe.name == meal_name).first()
+            if not recipe:
+                new_recipe = self.create_recipe(meal_name, meal_ingridients, meal_cooking_method)
+                db_sess.add(new_recipe)
+                db_sess.commit()
+                return "рецепт успешно добавлен"
+            else:
+                return "такой рецепт уже есть"
         else:
-            return "такой рецепт уже есть"
-
-
+            return "Вы не являетесь администратором"
+    
+    def set_admin(self, user_id, password):
+        check_password = 'Сарсапарилла'
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.namuser_id == user_id).first()
+        if user:
+            return "Вы уже администратор!"
+        elif password == check_password:
+            new_admin = self.create_admin(user_id, 1)
+            db_sess.add(new_user)
+            db_sess.commit()
+            return "Теперь вы админ!"
+        else:
+            return "Неправильный пароль"
+        
+           
 class AddUser(Command):
     pass
 
