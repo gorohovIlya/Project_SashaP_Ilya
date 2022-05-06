@@ -32,11 +32,11 @@ def work_bot(longpoll, vk_session, *commands):
                         elif command.get_name() in splitted_event_text:  # остальные команды
                             try:
                                 result = command.execute(event.user_id, *splitted_event_text[1:])
-                                break
                             except:
                                 result = 'скорее всего нельзя получить информацию про пользователя'
                             finally:
                                 send_mes(vk_session, event.peer_id, result)
+                                break
                 elif event.from_user:
                     user = vk_session.get_api().users.get(user_id=event.user_id, fields='domain')[0]
                     print('лс')
