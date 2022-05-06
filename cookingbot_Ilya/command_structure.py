@@ -4,6 +4,7 @@ from data.users import User
 import json
 from random import choice
 
+
 class Command:
     def __init__(self, my_bot, name, description):
         self.my_bot = my_bot
@@ -24,6 +25,7 @@ class HowToPrepare(Command):
     """
     This command accepts the name of the dish from the user and returns the ingredients and cooking method
     """
+
     def __init__(self, my_bot, name, description):
         super().__init__(my_bot, name, description)
 
@@ -34,7 +36,7 @@ class HowToPrepare(Command):
         for elem in my_query:
             splitted_elem_ingridients = elem.ingridients.split(" ,")
             splitted_cooking_method = elem.cooking_method.split(" ,")
-            return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + "\n"\
+            return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + "\n" \
                    + "\n".join(splitted_cooking_method)
 
 
@@ -42,6 +44,7 @@ class WhatToCookFrom(Command):
     """
     This command gets a list of ingredients from the user and returns the names of dishes that can be prepared from them
     """
+
     def __init__(self, my_bot, name, description):
         super().__init__(my_bot, name, description)
 
@@ -49,6 +52,7 @@ class WhatToCookFrom(Command):
         result = set()
         db_sess = db_session.create_session()
         user_ings = args[0].split('/')
+        print(args)
         all_recipe_info = db_sess.query(Recipe).all()
         for elem in all_recipe_info:
             recipe_ings = elem.ingridients
@@ -70,7 +74,8 @@ class RandomMeal(Command):
         db_sess = db_session.create_session()
         elem = choice(db_sess.query(Recipe).all())
         if elem != None:
-            return f'Я выбрал случайное блюдо: {elem.name}' + '\n' + 'Ингридиенты:' + "\n" + "\n".join(elem.ingridients.split(' ,')) + "\n" + 'Способ приготовления:' + "\n"\
+            return f'Я выбрал случайное блюдо: {elem.name}' + '\n' + 'Ингридиенты:' + "\n" + "\n".join(
+                elem.ingridients.split(' ,')) + "\n" + 'Способ приготовления:' + "\n" \
                    + "\n".join(elem.cooking_method.split(' ,'))
         else:
             return self.execute()
@@ -81,6 +86,7 @@ class AddMeal(Command):
     This command accepts from the user the name of the dish, the list of ingredients, the method of preparation and adds
     a new recipe to the database
     """
+
     def __init__(self, my_bot, name, description):
         super().__init__(my_bot, name, description)
         self.execute_all()
@@ -91,7 +97,7 @@ class AddMeal(Command):
         new_recipe.ingridients = ingridients
         new_recipe.cooking_method = cooking_method
         return new_recipe
-    
+
     def create_user(self, user_id, char):
         new_user = User()
         new_user.user_id = user_id
@@ -106,7 +112,8 @@ class AddMeal(Command):
             recipe = db_sess.query(Recipe).filter(Recipe.name == key).first()
             print(recipe)
             if not recipe:
-                new_recipe = self.create_recipe(key, " ,".join(value["ingridients"]), " ,".join(value["cooking_method"]))
+                new_recipe = self.create_recipe(key, " ,".join(value["ingridients"]),
+                                                " ,".join(value["cooking_method"]))
                 db_sess.add(new_recipe)
                 db_sess.commit()
                 print(new_recipe.name, new_recipe.ingridients, new_recipe.cooking_method)
@@ -116,7 +123,7 @@ class AddMeal(Command):
         meal_name = args[0]
         meal_ingridients = args[1]
         meal_cooking_method = args[2]
-        user = db_sess.query(User).filter(User.namuser_id == user_id).first()
+        user = db_sess.query(User).filter(User.user_id == user_id).first()
         if user:
             recipe = db_sess.query(Recipe).filter(Recipe.name == meal_name).first()
             if not recipe:
@@ -128,27 +135,35 @@ class AddMeal(Command):
                 return "такой рецепт уже есть"
         else:
             return "Вы не являетесь администратором"
-    
+
     def set_admin(self, user_id, password):
         check_password = 'Сарсапарилла'
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.namuser_id == user_id).first()
+        user = db_sess.query(User).filter(User.user_id == user_id).first()
         if user:
             return "Вы уже администратор!"
         elif password == check_password:
-            new_admin = self.create_admin(user_id, 1)
-            db_sess.add(new_user)
+            new_admin = self.create_user(user_id, 1)
+            db_sess.add(new_admin)
             db_sess.commit()
             return "Теперь вы админ!"
         else:
             return "Неправильный пароль"
-        
-           
-class AddUser(Command):
-    pass
 
 
+class Help(Command):
+    def __init__(self, my_bot, name, description):
+        super().__init__(my_bot, name, description)
 
-
+    def execute(self):
+        return '''
+        Вот что я умею:
+        add_meal; <ингредиент1 ,ингредиент2 ,...>; <действие1 ,действие2 ,...> - добавление блюда в базу данных
+        how_to_prepare; <название блюда> - получение рецепта блюда
+        what_to_cook_from; <ингредиент1/ингредиент2...> - получение названия блюда, которое можно сделать из \
+                                                                 введенных ингридиентов
+        random_meal - получение названия случайного блюда из базы данных
+        add_meal; set_admin; <Пароль модератора> - сделать пользователя модератором
+        '''
 
 

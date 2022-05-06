@@ -3,7 +3,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from random import randint
 from help import help
 from data import db_session, __all_models
-from command_structure import AddMeal, HowToPrepare, WhatToCookFrom, RandomMeal
+from command_structure import AddMeal, HowToPrepare, WhatToCookFrom, RandomMeal, Help
 
 
 def send_mes(vk, chat, text):
@@ -91,10 +91,11 @@ class CookingBot:
         how_to_pr = HowToPrepare(self, 'how_to_prepare', 'получение рецепта блюда')
         what_to_cook = WhatToCookFrom(self, 'what_to_cook_from', 'получение названия блюда, которое можно сделать из \
                                                                  введенных ингридиентов')
+        help = Help(self, 'help', 'информация о командах')
         rand_meal = RandomMeal(self, 'random_meal', 'получение названия случайного блюда из базы данных')
         longpoll = VkLongPoll(vk_session)
         print('работаем')
-        work_bot(longpoll, vk_session, add_m, how_to_pr, what_to_cook, rand_meal)
+        work_bot(longpoll, vk_session, add_m, how_to_pr, what_to_cook, rand_meal, help)
 
 
 if __name__ == '__main__':
