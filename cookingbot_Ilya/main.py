@@ -4,7 +4,6 @@ from random import randint
 from help import help
 from data import db_session, __all_models
 from command_structure import AddMeal, HowToPrepare, WhatToCookFrom, RandomMeal
-from sys import stdin
 
 
 def send_mes(vk, chat, text):
@@ -25,11 +24,11 @@ def work_bot(longpoll, vk_session, *commands):
                     splitted_event_text = event.text.split('; ')
                     print(splitted_event_text)
                     for command in commands:
-                        if command.get_name() == splitted_event_text[0] and len(splitted_event_text) == 1:  # проверка на random_meal
+                        if command.get_name() == splitted_event_text[0] == 'random_meal':  # проверка на random_meal
                             result = command.execute()
                             send_mes(vk_session, event.peer_id, result)
                             break
-                        elif command.get_name() in splitted_event_text:  # остальные команды
+                        elif command.get_name() == splitted_event_text[0] == 'add_meal':  # остальные команды
                             try:
                                 result = command.execute(event.user_id, *splitted_event_text[1:])
                             except:
@@ -37,6 +36,10 @@ def work_bot(longpoll, vk_session, *commands):
                             finally:
                                 send_mes(vk_session, event.peer_id, result)
                                 break
+                        elif command.get_name() == splitted_event_text[0]:
+                            result = command.execute(*splitted_event_text[1:])
+                            send_mes(vk_session, event.peer_id, result)
+                            break
                 elif event.from_user:
                     user = vk_session.get_api().users.get(user_id=event.user_id, fields='domain')[0]
                     print('лс')
@@ -50,16 +53,20 @@ def work_bot(longpoll, vk_session, *commands):
                     if splitted_event_text[0] in ['помощь', 'помогите', 'help']:
                         send_mes(vk_session, event.peer_id, help())
                     for command in commands:
-                        if command.get_name() == splitted_event_text[0] and command.get_name() == 'random_meal':  # проверка на random_meal
+                        if command.get_name() == splitted_event_text[0] == 'random_meal':  # проверка на random_meal
                             result = command.execute()
                             send_mes(vk_session, event.peer_id, result)
                             break
-                        elif command.get_name() in splitted_event_text:  # остальные команды
+                        elif command.get_name() == splitted_event_text == 'add_meal':  # остальные команды
                             if splitted_event_text[1] == "set_admin":
                                 result = command.set_admin(event.peer_id, splitted_event_text[2])
                                 send_mes(vk_session, event.peer_id, result)
                                 break
                             result = command.execute(event.peer_id, *splitted_event_text[1:])
+                            send_mes(vk_session, event.peer_id, result)
+                            break
+                        elif command.get_name() == splitted_event_text[0]:
+                            result = command.execute(*splitted_event_text[1:])
                             send_mes(vk_session, event.peer_id, result)
                             break
         if event.type == VkEventType.CHAT_UPDATE:
@@ -92,5 +99,3 @@ class CookingBot:
 
 if __name__ == '__main__':
     bot = CookingBot(token='1960805a354085e3eff3b7604706f98fb505669be7f68e3564080a4b19c5efb032c8de2530676593c891f')
-
-
