@@ -9,7 +9,7 @@ class User(SqlAlchemyBase):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    have_admin = sqlalchemy.Column(sqlalchemy.Char, nullable=True)
+    have_admin = sqlalchemy.Column(sqlalchemy.BOOLEAN, nullable=True)
 #     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 #     email = sqlalchemy.Column(sqlalchemy.String,
 #                               index=True, unique=True, nullable=True)
