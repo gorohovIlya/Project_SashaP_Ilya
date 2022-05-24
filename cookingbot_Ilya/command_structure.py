@@ -60,8 +60,7 @@ class WhatToCookFrom(Command):
                 if ing in recipe_ings:
                     result.add(elem.name)
         if result:
-            return "Вы можете приготовить" + "\n" + "\n".join(list(result))
-
+            return "Вы можете приготовить:" + "\n" + "\n".join(list(result))
         else:
             return 'вы ничего не можете с этими ингредиентами приготовить'
 
@@ -110,13 +109,11 @@ class AddMeal(Command):
             data = json.load(meals)
         for key, value in data.items():
             recipe = db_sess.query(Recipe).filter(Recipe.name == key).first()
-            print(recipe)
             if not recipe:
                 new_recipe = self.create_recipe(key, " ,".join(value["ingridients"]),
                                                 " ,".join(value["cooking_method"]))
                 db_sess.add(new_recipe)
                 db_sess.commit()
-                print(new_recipe.name, new_recipe.ingridients, new_recipe.cooking_method)
 
     def execute(self, user_id, *args):
         db_sess = db_session.create_session()
@@ -165,5 +162,3 @@ class Help(Command):
         random_meal - получение названия случайного блюда из базы данных
         add_meal; set_admin; <Пароль модератора> - сделать пользователя модератором
         '''
-
-
