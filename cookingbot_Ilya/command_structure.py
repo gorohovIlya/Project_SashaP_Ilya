@@ -27,17 +27,29 @@ class HowToPrepare(Command):
     """
 
     def __init__(self, my_bot, name, description):
+        self.flag = 0
         super().__init__(my_bot, name, description)
 
     def execute(self, *args):
         db_sess = db_session.create_session()
         meal = args[0]
-        my_query = db_sess.query(Recipe).filter(Recipe.name == meal)
-        for elem in my_query:
-            splitted_elem_ingridients = elem.ingridients.split(" ,")
-            splitted_cooking_method = elem.cooking_method.split(" ,")
-            return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + "\n" \
-                   + "\n".join(splitted_cooking_method)
+        dishes = [el.name for el in db_sess.query(Recipe).all()]
+        similar_dishes = [dish for dish in dishes if dish.startswith(meal)]
+        for dish in dishes:
+            if dish == meal:
+                my_query = db_sess.query(Recipe).filter(Recipe.name == meal)
+                for elem in my_query:
+                    splitted_elem_ingridients = elem.ingridients.split(" ,")
+                    splitted_cooking_method = elem.cooking_method.split(" ,")
+                    return 'Ингридиенты:' + "\n" + "\n".join(splitted_elem_ingridients) + "\n" + 'Способ приготовления:' + \
+                        "\n" + "\n".join(splitted_cooking_method)
+            elif dish != meal:
+                if len(similar_dishes) > 0:
+                    self.flag = 1
+                    return "Какое именно из этих блюд вы хотите приготовить?" + "\n" + "\n".join(similar_dishes)
+                else:
+                    return 'На данный момент такого рецепта нет в базе данных. Возможно, он появится в будущем, следите\
+                     за обновлениями'
 
 
 class WhatToCookFrom(Command):
@@ -162,3 +174,4 @@ class Help(Command):
         random_meal - получение названия случайного блюда из базы данных
         add_meal; set_admin; <Пароль модератора> - сделать пользователя модератором
         '''
+
